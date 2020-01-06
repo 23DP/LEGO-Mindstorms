@@ -24,10 +24,16 @@ def drive_straight(side: int, target: int, color: Color) ->int:
         steering.append(error/9)    
 
         wait(2) #Wait so we dont change the steering every 0.xx ms
-    robot.stop(stop_type = Stop.BRAKE)  
+    robot.stop(stop_type = Stop.BRAKE)
+    '''
+    TODO: fix the rotation to accurately 90 deg/s, right now 95 is 90 irl
+    '''
     return 95 - sum(diff(steering))    
 
 while not any(brick.buttons()):
+'''
+TODO: move more than just to the first line
+'''
     takeapic = drive_straight(1, 47, Color.RED)
     robot.drive_time(0, takeapic, 1000) 
     wait(1000)  #Wait 1s to capture the licence plates
