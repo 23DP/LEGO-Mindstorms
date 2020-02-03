@@ -6,46 +6,63 @@ from pybricks.parameters import (Port, Stop, Direction, Button, Color,
                                  SoundFile, ImageFile, Align)
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
-import lib
-import LVmodule as LV
+import lib, os
 
 
+#defining all sensors and motors that will be used
 right_motor = Motor(Port.C)
 left_motor = Motor(Port.B)
 color_sensor = ColorSensor(Port.S3)
-ir_sensor = InfraredSensor(Port.S4)
 
-robot = DriveBase(right_motor, left_motor, 35, 144) 
+robot = DriveBase(right_motor, left_motor, 35, 144) #Initialization of a driving base
 target = 47
 
-def drive_straight(side: int, color: Color, stops = 1) -> float:
-    historic_values = []
-    errors = []
-    while stops:
-        while color_sensor.color() != color : 
-            historic_values.append( target - color_sensor.reflection() )
-            steering = lib.PID(historic_values, 0.1, 0, 0.1)
-            errors.append(steering)
-            robot.drive(100, side*steering)    
 
-            wait(2) #Wait so we dont change the steering every 0.xx ms
-        stops -= 1
-        wait(5)
+def drive_straight(driving_side: int, color: Color):
+    error_history = [] # needed for PID
+    steering_history = [] #neded for deviation
+
+    while color_sensor.color() != color : 
+        error_history.append( target - color_sensor.reflection() )
+        steering = lib.PID(error_history, 0.1, 0, 0.1)
+        steering_history.append(steering)
+        robot.drive(100, driving_side*steering)    
+
+        wait(2) #Wait so we dont change the steering every 0.xx ms
+
 
     robot.stop(stop_type = Stop.BRAKE)
-    '''
-    TODO: fix the rotation to accurately 90 deg/s, right now 95 is 90 irl
-    '''
-    return 95 - lib.sum( lib.diff(errors))    
+    return lib.sum( lib.diff(steering_history))    
 
+
+color = [Color.GREEN, Color.RED, Color.BLUE]
+def getLogic(n: int):
+    rotation = 1 if n < 4 else -1 #rotation direction
+    retColor = color[n%3]
+    return (rotation, retColor) 
+
+
+# main loop
 while not any(brick.buttons()):
-    
-    while:
-        takeapic = drive_straight(1, Color.RED, 1)
-        robot.drive_time(0, takeapic, 1000) 
-        wait(1000)  #Wait 1s to capture the licence plates
-        robot.drive_time(0, 95, 1000) 
+    os.system('clear')    
 
-        rideback = drive_straight(-1, Color.YELLOW)
-        robot.drive_time(0, 95, 2000)
+    n = int( input("Broj parking mesta: ") )# waiting for a signal that there is a new car
+    rotation_side, color = getLogic(n)
+
+    offset = drive_straight(1, color)
+    rotation_angle = (90 + offset, 1000) if n > 3 else (90 - offset, 1000)
+    wait(20)
+    robot.drive_time(0, rotation_side*rotation_angle, 1000) #rotate
+ 
+    paid = (input('Da li je placeno? [Y/n]') or 'y')
+    paid = 1 if paid.lower() == 'y' else 0
     
+    if paid:
+       brick.sound.file(SoundFile.CHEERING)
+    else:
+        brick.sound.file(SoundFile.UH_OH)
+
+    robot.drive_time(0, rotation_side*90, 1000) 
+
+    _ = drive_straight(-1, Color.YELLOW)
+    robot.drive_time(0, 90, 2000) #90 degrees for 2 seconds = 180
