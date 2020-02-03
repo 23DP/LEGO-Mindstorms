@@ -46,4 +46,4 @@ def executeCamera():
     takePicture()
     picture = getLatestPictureName()
     downloadPicture(picture)
-    return picture
+    return picture # LabView needs the name as a return value
