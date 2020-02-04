@@ -16,7 +16,7 @@ def getLogic(n: int):
     rotation = 1 if n < 4 else -1 #rotation direction
     retColor = colors_list[n%3]   #this depends on your parking design
     return (rotation, retColor) 
-#TODO: move this to lib.py
+
 
 #improvised PID, since we don't have the model of our system
 def PID(values: list, kp: float, ki: float, kd: float) -> float:
