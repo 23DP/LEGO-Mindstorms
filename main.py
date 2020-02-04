@@ -41,20 +41,12 @@ def drive_straight(driving_side: int, color: Color):
     robot.stop(stop_type = Stop.BRAKE)
     return sum( lib.diff(steering_history)) #Return the deviation from 0deg 
 
-
-colors_list = [Color.GREEN, Color.RED, Color.BLUE]
-def getLogic(n: int):
-    rotation = 1 if n < 4 else -1 #rotation direction
-    retColor = colors_list[n%3]   #this depends on your parking design
-    return (rotation, retColor) 
-#TODO: move this to lib.py
-
 # main loop
 while not any(brick.buttons()):
     os.system('clear') # clearing the terminal for every iteration  
 
     n = int( input('Parking spot number: ') )  # waiting for a signal that there is a new car
-    rotation_side, color = getLogic(n)
+    rotation_side, color = lib.getLogic(n)
     
     offset = drive_straight(1, color) # reach the depth of the parked car
 
