@@ -39,7 +39,7 @@ def drive_straight(driving_side: int, color: Color):
 
 
     robot.stop(stop_type = Stop.BRAKE)
-    return lib.sum( lib.diff(steering_history)) #Return the deviation from 0deg 
+    return sum( lib.diff(steering_history)) #Return the deviation from 0deg 
 
 
 colors_list = [Color.GREEN, Color.RED, Color.BLUE]
@@ -63,7 +63,7 @@ while not any(brick.buttons()):
     let's say 2degrees, if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
     NOTE: in reality, this will not be exactly 90degs, due the friction and additional weight (real values found in experiment)
     '''
-    rotation_angle = (90 + offset, 1000) if n > 3 else (90 - offset, 1000)
+    rotation_angle = (90 + offset) if n > 3 else (90 - offset)
     robot.drive_time(0, rotation_side*rotation_angle, 1000) #rotate to take a pic
  
     # if theres no input, Yes is default, everything except 'y' will be considered a no
