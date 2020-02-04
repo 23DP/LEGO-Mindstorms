@@ -58,8 +58,11 @@ while not any(brick.buttons()):
     
     offset = drive_straight(1, color) # reach the depth of the parked car
 
-    # offset affects rotation differently depending on the side (clockwise or counter clockwise)
-    # if the robot is rotatet, e.g. 2degrees, if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
+    '''
+    offset affects rotation differently depending on the side (clockwise or counter clockwise). If the robot is rotated,
+    let's say 2degrees, if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
+    NOTE: in reality, this will not be exactly 90degs, due the friction and additional weight (real values found in experiment)
+    '''
     rotation_angle = (90 + offset, 1000) if n > 3 else (90 - offset, 1000)
     robot.drive_time(0, rotation_side*rotation_angle, 1000) #rotate to take a pic
  
