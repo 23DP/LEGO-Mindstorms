@@ -15,15 +15,21 @@ left_motor = Motor(Port.B)
 color_sensor = ColorSensor(Port.S3)
 
 robot = DriveBase(right_motor, left_motor, 35, 144) #Initialization of a driving base
-target = 47 # return value from the reflection senscor when 50% on the line
+target = 47 # return value from the reflection senscor when 50% on the line (got by experiment)
 
 
+''' 
+Since this is a general function for staight movement, we have to consider that the robot maz find himself on the
+opposite side of the line. drivig_side parameter will tell us wether the robot is facing north or south (from parking's perspective)
+If robot is going south, driving_side will equal to -1, since he is on the other side of the line - this is due to imperfect rotation
+'''
 def drive_straight(driving_side: int, color: Color):
     error_history = [] # needed for PID
     steering_history = [] #neded for deviation
 
     #until he reaches the given spot
     while color_sensor.color() != color : 
+      
         error_history.append( target - color_sensor.reflection() ) #append the error
         steering = lib.PID(error_history, 0.1, 0, 0.1)
         steering_history.append(steering)
@@ -39,7 +45,7 @@ def drive_straight(driving_side: int, color: Color):
 colors_list = [Color.GREEN, Color.RED, Color.BLUE]
 def getLogic(n: int):
     rotation = 1 if n < 4 else -1 #rotation direction
-    retColor = colors_list[n%3] #this depends on your parking design
+    retColor = colors_list[n%3]   #this depends on your parking design
     return (rotation, retColor) 
 #TODO: move this to lib.py
 
@@ -47,15 +53,17 @@ def getLogic(n: int):
 while not any(brick.buttons()):
     os.system('clear') # clearing the terminal for every iteration  
 
-    n = int( input("Parking spot number: ") )# waiting for a signal that there is a new car
+    n = int( input('Parking spot number: ') )  # waiting for a signal that there is a new car
     rotation_side, color = getLogic(n)
     
     offset = drive_straight(1, color) # reach the depth of the parked car
 
     # offset affects rotation differently depending on the side (clockwise or counter clockwise)
+    # if the robot is rotatet, e.g. 2degrees, if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
     rotation_angle = (90 + offset, 1000) if n > 3 else (90 - offset, 1000)
     robot.drive_time(0, rotation_side*rotation_angle, 1000) #rotate to take a pic
  
+    # if theres no input, Yes is default, everything except 'y' will be considered a no
     paid = (input('Confirm payment? [Y/n]') or 'y')
     paid = 1 if paid.lower() == 'y' else 0
     
@@ -64,6 +72,6 @@ while not any(brick.buttons()):
     else:
         brick.sound.file(SoundFile.UH_OH)
 
-    robot.drive_time(0, rotation_side*90, 1000) # go back to the resting spot
+    robot.drive_time(0, rotation_side*90, 1000) # Rotate to south
     _ = drive_straight(-1, Color.YELLOW)
-    robot.drive_time(0, 180, 1000) # Rotate to face the parking and rest until the next signal
+    robot.drive_time(0, 180, 1000) # Rotate to face the north and rest until the next signal
