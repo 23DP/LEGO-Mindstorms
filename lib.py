@@ -1,4 +1,4 @@
-from pybricks import Color
+from pybricks.parameters import Color
 '''
 NOTE: yes, diff already exists in numpy, but the robot has no internet access, so we had to make our own
 '''
