@@ -1,3 +1,4 @@
+from pybricks import Color
 '''
 NOTE: yes, diff already exists in numpy, but the robot has no internet access, so we had to make our own
 '''
@@ -8,6 +9,14 @@ def diff(arr):
     for i in range(len(arr) - 1):
         retarr.append(arr[i + 1] - arr[i])
     return retarr
+
+
+colors_list = [Color.GREEN, Color.RED, Color.BLUE]
+def getLogic(n: int):
+    rotation = 1 if n < 4 else -1 #rotation direction
+    retColor = colors_list[n%3]   #this depends on your parking design
+    return (rotation, retColor) 
+#TODO: move this to lib.py
 
 #improvised PID, since we don't have the model of our system
 def PID(values: list, kp: float, ki: float, kd: float) -> float:
