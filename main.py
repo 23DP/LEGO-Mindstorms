@@ -31,7 +31,7 @@ def drive_straight(driving_side: int, color: Color):
     while color_sensor.color() != color : 
       
         error_history.append( target - color_sensor.reflection() ) #append the error
-        steering = lib.PID(error_history, 0.1, 0, 0.1)
+        steering = lib.PID(error_history, 0.1, 0, 0.3)
         steering_history.append(steering)
         robot.drive(100, driving_side*steering)    
 
@@ -52,7 +52,7 @@ while not any(brick.buttons()):
 
     '''
     offset affects rotation differently depending on the side (clockwise or counter clockwise). If the robot is rotated,
-    let's say 2degrees, if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
+    let's say 2degrees (consequence of driving), if he is supposed to rotate 90, he only needs 88degrees (-92 if rotating left)
     NOTE: in reality, this will not be exactly 90degs, due the friction and additional weight (real values found in experiment)
     '''
     rotation_angle = (90 + offset) if n > 3 else (90 - offset)
